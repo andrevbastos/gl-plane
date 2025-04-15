@@ -6,18 +6,11 @@
 * OpenGL 3.3+
 * GLFW3
 * GLM
+* IFCG
 
-Ubuntu:
 ```bash
 sudo apt-get install build-essential gpp cmake
 sudo apt-get install libglfw3-dev libglm-dev
-```
-
-Arch:
-```bash
-sudo pacman -S cmake
-sudo pacman -S glm
-sudo pamcan -S glfw
 ```
 
 ## 🔧 Compiling
