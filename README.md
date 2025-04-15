@@ -17,7 +17,7 @@ sudo apt-get install libglfw3-dev libglm-dev
 
 Clone the repository:
 ```bash
-git clone https://gitlab.com/oederaugusto/ifcg
+git clone https://github.com/andrevbastos/gl-plane
 cd ifcg
 mkdir build
 cd build
