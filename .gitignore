@@ -1,0 +1,9 @@
+build/
+.cache/
+.vscode/
+out/
+
+compile_commands.json
+*.exe
+*.dll
+*.so
