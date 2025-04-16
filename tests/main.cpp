@@ -16,25 +16,21 @@ int main()
 
     Shader shader3D = IFCG::getDefaultShader3D();
 
-    Camera3D camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
-
-    Plane teste(shader3D.id);
+    Plane teste(shader3D.id, width, height);
 
     while (!IFCG::shouldClose())
     {
+        IFCG::readInputs();
         IFCG::processInput();
-        IFCG::clearBuffer(1.0f, 1.0f, 1.0f, 1.0f);
+        IFCG::clearBuffer(0.5f, 0.5f, 0.7f, 1.0f);
 
         shader3D.activate();
         
-        camera.inputs(IFCG::window);
-        camera.update(90.0f, 0.1f, 100.0f, shader3D.id);
-        
         teste.inputs(IFCG::window);
+        teste.update();
         teste.draw();
 
         IFCG::swapBuffer();
-        IFCG::readInputs();
     }
 
     IFCG::terminate();

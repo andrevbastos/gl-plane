@@ -70,7 +70,7 @@ namespace ifcg
         if (instance == nullptr)
         {
             instance = new IFCG();
-            window = NULL;
+            window = nullptr;
         }
     };
 
@@ -97,6 +97,7 @@ namespace ifcg
             {
                 std::cerr << "Failed to create GLFW window" << std::endl;
                 glfwTerminate();
+                return;
             }
         }
 
@@ -116,7 +117,11 @@ namespace ifcg
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
             std::cout << "Failed to initialize GLAD" << std::endl;
+            glfwTerminate();
+            return;
         }
+        
+        glEnable(GL_DEPTH_TEST); 
     };
 
     void IFCG::destroyWindow()

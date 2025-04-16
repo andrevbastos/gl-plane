@@ -12,33 +12,25 @@
 
 namespace camera
 {
-	class Camera3D
-	{
-	public:
-		glm::vec3 position;
-		glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
-		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	
-		bool firstClick = true;
-	
-		int width;
-		int height;
-	
-		float speed = 0.1f;
-		float sensitivity = 100.0f;
-	
-		Camera3D(int width, int height, glm::vec3 position);
-	
-		void update(float FOVdeg, float nearPlane, float farPlane, GLuint shaderID);
-		void inputs(GLFWwindow* window);
-	};
+	class Camera3D {
+		public:
+			Camera3D(int width, int height, glm::vec3 position);
+			void update(float FOVdeg, float nearPlane, float farPlane, GLuint shaderID);
+			void followTarget(const glm::vec3& targetPos, const glm::vec3& targetForward, const glm::vec3& planeUp);
+		private:
+			glm::vec3 position;
+			glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
+			glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+			glm::vec3 targetPosition;
+			glm::vec3 offset = glm::vec3(0.0f, 2.0f, -3.0f); 
+
+			bool firstClick = true;
+			int width;
+			int height;
+		};
 
 	Camera3D::Camera3D(int width, int height, glm::vec3 position)
-	{
-		Camera3D::width = width;
-		Camera3D::height = height;
-		position = position;
-	}
+		: width(width), height(height), position(position) {}
 
 	void Camera3D::update(float FOVdeg, float nearPlane, float farPlane, GLuint shaderID)
 	{
@@ -56,75 +48,17 @@ namespace camera
 		);
 	}
 
-	void Camera3D::inputs(GLFWwindow* window)
-	{
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			position += speed * orientation;
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			position += speed * -glm::normalize(glm::cross(orientation, up));
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			position += speed * -orientation;
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			position += speed * glm::normalize(glm::cross(orientation, up));
-		}
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		{
-			position += speed * up;
-		}
-		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		{
-			position += speed * -up;
-		}
-		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		{
-			speed = 0.4f;
-		}
-		else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-		{
-			speed = 0.1f;
-		}
-
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-		{
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
-			if (firstClick)
-			{
-				glfwSetCursorPos(window, (width / 2), (height / 2));
-				firstClick = false;
-			}
-
-			double mouseX;
-			double mouseY;
-			glfwGetCursorPos(window, &mouseX, &mouseY);
-
-			float rotX = sensitivity * (float)(mouseY - (height / 2)) / height;
-			float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
-
-			glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX), glm::normalize(glm::cross(orientation, up)));
-
-			if (abs(glm::angle(newOrientation, up) - glm::radians(90.0f)) <= glm::radians(85.0f))
-			{
-				orientation = newOrientation;
-			}
-
-			orientation = glm::rotate(orientation, glm::radians(-rotY), up);
-
-			glfwSetCursorPos(window, (width / 2), (height / 2));
-		}
-		else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-		{
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			firstClick = true;
-		}
+	void Camera3D::followTarget(const glm::vec3& targetPos, const glm::vec3& targetForward, const glm::vec3& planeUp) {
+		glm::vec3 desiredPosition = targetPos - (targetForward * offset.z) + (planeUp * offset.y);
+	
+		position = glm::mix(position, desiredPosition, 0.1f);
+	
+		glm::vec3 lookAtPoint = targetPos + (targetForward / 4.0f);
+		orientation = glm::normalize(lookAtPoint - position);
+	
+		up = glm::normalize(planeUp);
 	}
+
 }
 
 using namespace camera;
